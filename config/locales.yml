@@ -5,6 +5,7 @@ uk:
 us:
   start_month: 10
   start_week: 22
+  start_period: 5
 pakistan:
   start_month: 7
 australia:

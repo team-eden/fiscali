@@ -9,6 +9,8 @@ module RisingSun
     FISCAL_ZONE = HashWithIndifferentAccess.new(YAML.load_file(File.join(File.dirname(__FILE__), '../..', 'config/locales.yml')))
     FY_START_MONTH = 1
     FY_START_WEEK = 1
+    FY_START_PERIOD = 1
+    MOTHNS_PER_YEAR = 12
     WEEKS_PER_YEAR = 52
 
     module ClassMethods
@@ -16,6 +18,7 @@ module RisingSun
       def fiscal_zone=(zone)
         @fiscali_start_month = FISCAL_ZONE.dig(zone, :start_month) || FY_START_MONTH
         @fiscali_start_week = FISCAL_ZONE.dig(zone, :start_week) || FY_START_WEEK
+        @fiscali_start_period = FISCAL_ZONE.dig(zone, :start_period) || FY_START_PERIOD
         @fiscali_zone = zone
       end
 
@@ -25,6 +28,10 @@ module RisingSun
 
       def fy_start_week
         @fiscali_start_week
+      end
+
+      def fy_start_period
+        @fiscali_start_period
       end
 
       def fiscal_zone
@@ -141,6 +148,12 @@ module RisingSun
       rounded_value(week, WEEKS_PER_YEAR)
     end
 
+    def financial_period
+      period = self.month + self.class.fy_start_period
+      period += 1 if self > last_sunday(self)
+      rounded_value(period, MOTHNS_PER_YEAR)
+    end
+
     private
 
     def year_of_financial_year_beginning
@@ -168,8 +181,19 @@ module RisingSun
       self.prev_year.end_of_year.strftime('%U').to_i
     end
 
+    def financial_quarter_date(quarter)
+      quarter = (months_between / 3).floor + 1 unless quarter.in?(1..4)
+      beginning_of_financial_year.advance(months: quarter * 3 - 1)
+    end
+
     def rounded_value(value, count)
       (value % (count + 1) + value / (count + 1)).to_i
+    end
+
+    def last_sunday(day)
+      date = Date.new(day.year, day.month, -1)
+      #subtract number of days we are ahead of sunday
+      date - date.wday
     end
   end
 end

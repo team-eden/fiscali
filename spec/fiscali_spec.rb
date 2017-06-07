@@ -222,4 +222,20 @@ describe "fiscali" do
       end
     end
   end
+
+  describe "#financial_period" do
+    it "returns the correct financial period" do
+      dates = {
+        Date.new(2017, 1, 1) => 6,
+        Date.new(2017, 7, 30) => 12,
+        Date.new(2017, 7, 31) => 1,
+        Date.new(2018, 7, 29) => 12,
+        Date.new(2018, 7, 30) => 1
+      }
+
+      dates.each do |day, period|
+        expect(day.financial_period).to eq period
+      end
+    end
+  end
 end
