@@ -1,0 +1,16 @@
+india:
+  start_month: 4
+uk:
+  start_month: 4
+us:
+  start_month: 10
+pakistan:
+  start_month: 7
+australia:
+  start_month: 7
+ireland:
+  start_month: 1
+nz:
+  start_month: 7
+japan:
+  start_month: 4

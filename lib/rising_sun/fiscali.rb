@@ -1,17 +1,18 @@
+require 'yaml'
+
 module RisingSun
   module Fiscali
     def self.included(base)
       base.extend ClassMethods
     end
 
-    FISCAL_ZONE = {:india => 4, :uk => 4, :us => 10, :pakistan => 7,
-                   :australia => 7, :ireland => 1, :nz => 7, :japan => 4}
+    FISCAL_ZONE = HashWithIndifferentAccess.new(YAML.load_file(File.join(File.dirname(__FILE__), '../..', 'config/locales.yml')))
     FY_START_MONTH = 1
 
     module ClassMethods
 
       def fiscal_zone=(zone)
-        @fiscali_start_month = FISCAL_ZONE[zone] || FY_START_MONTH
+        @fiscali_start_month = FISCAL_ZONE.dig(zone, :start_month) || FY_START_MONTH
         @fiscali_zone = zone
       end
 
