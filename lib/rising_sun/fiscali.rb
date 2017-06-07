@@ -8,16 +8,23 @@ module RisingSun
 
     FISCAL_ZONE = HashWithIndifferentAccess.new(YAML.load_file(File.join(File.dirname(__FILE__), '../..', 'config/locales.yml')))
     FY_START_MONTH = 1
+    FY_START_WEEK = 1
+    WEEKS_PER_YEAR = 52
 
     module ClassMethods
 
       def fiscal_zone=(zone)
         @fiscali_start_month = FISCAL_ZONE.dig(zone, :start_month) || FY_START_MONTH
+        @fiscali_start_week = FISCAL_ZONE.dig(zone, :start_week) || FY_START_WEEK
         @fiscali_zone = zone
       end
 
       def fy_start_month
         @fiscali_start_month || FY_START_MONTH
+      end
+
+      def fy_start_week
+        @fiscali_start_week
       end
 
       def fiscal_zone
@@ -126,6 +133,14 @@ module RisingSun
       end
     end
 
+    def financial_week_of_year(mondays = false)
+      # Use %U for weeks starting on Sunday
+      # Use %W for weeks starting on Monday
+      week = self.class.fy_start_week + strftime(mondays ? '%W' : '%U').to_i - 1
+      week += 1 if max_week_of_prev_year == 53
+      rounded_value(week, WEEKS_PER_YEAR)
+    end
+
     private
 
     def year_of_financial_year_beginning
@@ -147,6 +162,14 @@ module RisingSun
 
     def start_month
       self.class.fy_start_month || FY_START_MONTH
+    end
+
+    def max_week_of_prev_year
+      self.prev_year.end_of_year.strftime('%U').to_i
+    end
+
+    def rounded_value(value, count)
+      (value % (count + 1) + value / (count + 1)).to_i
     end
   end
 end

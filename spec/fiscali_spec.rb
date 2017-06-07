@@ -205,4 +205,21 @@ describe "fiscali" do
       end
     end
   end
+
+  describe "#financial_week_of_year" do
+    it "returns the correct financial week" do
+      Date.fiscal_zone = :us
+      dates = {
+        Date.new(2017, 1, 1) => 22,
+        Date.new(2017, 7, 30) => 52,
+        Date.new(2017, 8, 9) => 1,
+        Date.new(2018, 1, 28) => 26,
+        Date.new(2018, 7, 29) => 52
+      }
+
+      dates.each do |day, period|
+        expect(day.financial_week_of_year).to eq period
+      end
+    end
+  end
 end
